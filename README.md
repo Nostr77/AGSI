@@ -15,11 +15,8 @@ European Natural Gas Data Automatic Analytical Dashboard (Stock, Injection, With
 Analysts, Economic Mass Media
 
 
+## Data Flows (ETL schema) 
 
-## Data Source for Dashboard 
-
-
-ETL Scheme
 
 
 
