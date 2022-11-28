@@ -17,7 +17,7 @@ Analysts, Economic Mass Media
 
 ## Data Flows (ETL schema) 
 
-
+![Schema](https://github.com/Nostr77/AGSI/raw/main/Schema.JPG)
 
 
 #Phace 1. Cleaning and Data gathering
