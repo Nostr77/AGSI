@@ -24,6 +24,47 @@ Analysts, Economic Mass Media
 Input: API 
 Output: CSV
 
+```
+import requests
+import json 
+import time
+import pandas as pd
+
+countrylist=['AT','BE','BG','CZ','DE','DK','ES','FR','GB','HR','HU','IE','IT','LV','NL','PL','PT','RO','SE','SK','UA']
+
+b=[]
+for country in countrylist:
+    url='https://agsi.gie.eu/api?country='+country+'&from=2020-01-01&to=2022-11-10&page=1&size=15000' #+
+    response = requests.get(url)
+    print(response.content)
+    copia=response.content
+    a=json.loads(response.content)['data']
+    print(country)
+    b=a+b
+    time.sleep(3)
+
+c=b
+
+adf=pd.DataFrame()
+#for k,v in b[0].items():
+#    if k=='full':
+#        k='full_'
+#    if k!='info':
+#        adf[k]=v
+#        print(v)
+
+for i in range(0,len(b)):
+    for k,v in b[i].items():
+        if k=='full':
+            k='full_'
+        if k!='info':
+            #adf[k]=v
+            adf.loc[i,k]=v
+    if i%100==0:
+        print(i)
+
+adf.to_csv(r'c:\work\agsi\prom2022.csv')
+```
 
 
 ## Pace 1b. Cleaning and SQL injection (Python)
@@ -59,7 +100,7 @@ bucket = list(range(0,len(df.code)-1,1000))
 bucket.append(len(df.code)-1)
 
 # Connect to SQL database via ODBC connection
-password = r'Mmmmmm-92' 
+password = r'XXXXXX' 
 cnxn = pyodbc.connect(r'Driver={SQL Server};Server=tcp:XXXXX.database.windows.net,1433;Database=agsi;Uid=XXXXX;Pwd='+password+';Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;')
 cursor = cnxn.cursor()
 
