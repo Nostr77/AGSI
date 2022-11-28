@@ -18,12 +18,12 @@ European Natural Gas Data Automatic Analytical Dashboard (Stock, Injection, With
 Analysts, Economic Mass Media
 
 
-## Data Flows (ETL schema) 
+## Data Flows 
 
 ![Schema](https://github.com/Nostr77/AGSI/raw/main/Schema.JPG)
 
 
-## Pace 1a. Data gathering (Python)
+## Py1a. Data gathering (Python)
 Input: API 
 Output: CSV
 
@@ -70,7 +70,7 @@ adf.to_csv(r'c:\work\agsi\prom2022.csv')
 ```
 
 
-## Pace 1b. Cleaning and SQL injection (Python)
+## Py1b. Cleaning and SQL injection (Python)
 
 Input: CSV 
 Output: SQL
@@ -122,4 +122,92 @@ cnxn.commit()
 cursor.close()
 
 ```
+
+## Py2: Data injection on schedule
+
+Input: API 
+Output: CSV & SQL
+
+```
+import requests
+import json 
+import time
+import pyodbc
+import pandas as pd
+pd.options.mode.chained_assignment = None
+
+# Connect to SQL database via ODBC connection
+password = r'XXX' 
+cnxn = pyodbc.connect(r'Driver={SQL Server};Server=tcp:XXX.database.windows.net,1433;Database=agsi;Uid=XXX;Pwd='+password+';Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;')
+cursor = cnxn.cursor()
+
+# Grab start date and last date from SQL and today
+data_last=cursor.execute('select max(gasDayStart) from agsi').fetchall()
+date1=data_last[0][0]
+date2=str(pd.to_datetime('today').normalize().date())
+
+# scraping API
+countrylist=['AT','BE','BG','CZ','DE','DK','ES','FR','GB*','HR','HU','IE','IT','LV','NL','PL','PT','RO','SE','SK','UA']
+
+b=[]
+for country in countrylist:
+    #country="RO"
+    url='https://agsi.gie.eu/api?country='+country+'&from='+date1+'&to='+date2+'&page=1&size=15000' #+
+    response = requests.get(url)
+    #print(response.content)
+    copia=response.content
+    a=json.loads(response.content)['data']
+    print(country)
+    b=a+b
+    time.sleep(3)
+
+c=b
+
+adf=pd.DataFrame()
+
+for i in range(0,len(b)):
+    for k,v in b[i].items():
+        if k=='full':
+            k='full_'
+        if k!='info':
+            #adf[k]=v
+            adf.loc[i,k]=v
+    if i%100==0:
+        print(i)
+
+adf.to_csv(r'c:\work\agsi\prom'+date2+'.csv')
+adf=adf[adf.gasDayStart!=date1].reset_index(drop=True)
+
+df = adf
+
+# Income Dataframe Cleaning
+df.gasInStorage[df.gasInStorage=='-']=0
+df.injection[df.injection=='-']=0
+df.consumption[df.consumption=='-']=0
+df.consumptionFull[df.consumptionFull=='-']=0
+df.withdrawal[df.withdrawal=='-']=0
+df.netWithdrawal[df.netWithdrawal=='-']=0
+df.workingGasVolume[df.workingGasVolume=='-']=0
+df.injectionCapacity[df.injectionCapacity=='-']=0
+df.withdrawalCapacity[df.withdrawalCapacity=='-']=0
+df.trend[df.trend=='-']=0
+df.full_[df.full_=='-']=0
+
+df.code[df.code=='GB*']='GB'
+df.url[df.url=='GB*']='GB'
+
+# Insert Dataframe into SQL Server:
+string=r"INSERT INTO agsi (code,url,gasDayStart,gasInStorage,consumption,consumptionFull,injection,withdrawal,netWithdrawal,workingGasVolume,injectionCapacity,withdrawalCapacity,status,trend,full_) values"
+i=0
+string=string+" ('"+df.code[i]+"','"+df.url[i]+"','"+str(df.gasDayStart[i])+"',"+str(df.gasInStorage[i])+","+str(df.consumption[i])+","+str(df.consumptionFull[i])+","+str(df.injection[i])+","+str(df.withdrawal[i])+","+str(df.netWithdrawal[i])+","+str(df.workingGasVolume[i])+","+str(df.injectionCapacity[i])+","+str(df.withdrawalCapacity[i])+",'"+df.status[i]+"',"+str(df.trend[i])+","+str(df.full_[i])+")"
+for i in range(1,len(df.code)): 
+    string=string+", ('"+df.code[i]+"','"+df.url[i]+"','"+str(df.gasDayStart[i])+"',"+str(df.gasInStorage[i])+","+str(df.consumption[i])+","+str(df.consumptionFull[i])+","+str(df.injection[i])+","+str(df.withdrawal[i])+","+str(df.netWithdrawal[i])+","+str(df.workingGasVolume[i])+","+str(df.injectionCapacity[i])+","+str(df.withdrawalCapacity[i])+",'"+df.status[i]+"',"+str(df.trend[i])+","+str(df.full_[i])+")"
+#print(string)
+cursor.execute(string)
+
+cnxn.commit()
+cursor.close()
+
+```
+
 
