@@ -1,6 +1,6 @@
 # AGSI
 
-## [!! PowerBI file is here !!](https://github.com/Nostr77/AGSI/blob/main/agsi-github.pbix)
+## [!! PowerBI file is here !!]([https://github.com/Nostr77/AGSI/blob/main/agsi-github.pbix](https://github.com/Nostr77/AGSI/blob/main/agsi-github.pbix?raw=true))
 
 
 ## Overwiew
