@@ -20,4 +20,62 @@ Analysts, Economic Mass Media
 ![Schema](https://github.com/Nostr77/AGSI/raw/main/Schema.JPG)
 
 
-#Phace 1. Cleaning and Data gathering
+## Pace 1a. Data gathering (Python)
+Input: API 
+Output: CSV
+
+
+
+## Pace 1b. Cleaning and SQL injection (Python)
+
+Input: CSV 
+Output: SQL
+
+```
+import pyodbc
+import pandas as pd
+pd.options.mode.chained_assignment = None
+
+# Read income dataframe
+df = pd.read_csv("c:\\work\\agsi\prom2022.csv")
+
+# Income Dataframe Cleaning
+df=df.drop(['Unnamed: 0'], axis=1)
+df.gasInStorage[df.gasInStorage=='-']=0
+df.injection[df.injection=='-']=0
+df.consumption[df.consumption=='-']=0
+df.consumptionFull[df.consumptionFull=='-']=0
+df.withdrawal[df.withdrawal=='-']=0
+df.netWithdrawal[df.netWithdrawal=='-']=0
+df.workingGasVolume[df.workingGasVolume=='-']=0
+df.injectionCapacity[df.injectionCapacity=='-']=0
+df.withdrawalCapacity[df.withdrawalCapacity=='-']=0
+df.trend[df.trend=='-']=0
+df.full_[df.full_=='-']=0
+
+
+# Calculate buckets for 1000 records inserting
+bucket = list(range(0,len(df.code)-1,1000))
+bucket.append(len(df.code)-1)
+
+# Connect to SQL database via ODBC connection
+password = r'Mmmmmm-92' 
+cnxn = pyodbc.connect(r'Driver={SQL Server};Server=tcp:XXXXX.database.windows.net,1433;Database=agsi;Uid=XXXXX;Pwd='+password+';Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;')
+cursor = cnxn.cursor()
+
+# Insert Dataframe into SQL Server:
+for bu in bucket:
+    string=r"INSERT INTO agsi (code,url,gasDayStart,gasInStorage,consumption,consumptionFull,injection,withdrawal,netWithdrawal,workingGasVolume,injectionCapacity,withdrawalCapacity,status,trend,full_) values"
+    i=bu
+    string=string+" ('"+df.code[i]+"','"+df.url[i]+"','"+str(df.gasDayStart[i])+"',"+str(df.gasInStorage[i])+","+str(df.consumption[i])+","+str(df.consumptionFull[i])+","+str(df.injection[i])+","+str(df.withdrawal[i])+","+str(df.netWithdrawal[i])+","+str(df.workingGasVolume[i])+","+str(df.injectionCapacity[i])+","+str(df.withdrawalCapacity[i])+",'"+df.status[i]+"',"+str(df.trend[i])+","+str(df.full_[i])+")"
+    for i in range(bu+1,bu+min(1000, len(df.code)-bu-1)): #len(df.code)):
+        string=string+", ('"+df.code[i]+"','"+df.url[i]+"','"+str(df.gasDayStart[i])+"',"+str(df.gasInStorage[i])+","+str(df.consumption[i])+","+str(df.consumptionFull[i])+","+str(df.injection[i])+","+str(df.withdrawal[i])+","+str(df.netWithdrawal[i])+","+str(df.workingGasVolume[i])+","+str(df.injectionCapacity[i])+","+str(df.withdrawalCapacity[i])+",'"+df.status[i]+"',"+str(df.trend[i])+","+str(df.full_[i])+")"
+        #print(i)
+    print('Progress: '+str(bu)+' / '+str(len(df.code)-1))
+    cursor.execute(string)
+
+cnxn.commit()
+cursor.close()
+
+```
+
