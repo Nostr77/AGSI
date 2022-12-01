@@ -1,4 +1,4 @@
-# AGSI
+# AGSI-GitHub (PowerBI + Python)
 
 ## [!! PowerBI file is here !!](https://github.com/Nostr77/AGSI/blob/main/agsi-github.pbix?raw=true)
 
@@ -16,8 +16,7 @@ Timeline: 2012's first day to the present. The PoweBI Dashboard combines data fr
 ![Schema](https://github.com/Nostr77/AGSI/raw/main/Schema.JPG)
 
 ### Outcome file(s):
-1) Based on archive data from Github - [PowerBI Github](https://github.com/Nostr77/AGSI/blob/main/agsi-github.pbix)
-2) Based on SQL Server archive data (to be uploaded soon)
+File is based on archive data from Github [PowerBI Github](https://github.com/Nostr77/AGSI/blob/main/agsi-github.pbix)
 ![Schema](https://github.com/Nostr77/AGSI/raw/main/Capture1.JPG)
 ![Schema](https://github.com/Nostr77/AGSI/raw/main/Capture3.JPG)
 ![Schema](https://github.com/Nostr77/AGSI/raw/main/Capture2.JPG)
