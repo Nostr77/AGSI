@@ -30,6 +30,7 @@ Analysts, Economic Mass Media
 
 
 
+## Code samples
 
 ## Py1a. Data gathering (Python)
 Input: API 
