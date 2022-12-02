@@ -321,3 +321,14 @@ in
     #"Changed Type1"
 ```
 
+
+DAX Header
+
+```
+DTO3 = IF(HASONEVALUE( Dict1[Indicator]),
+ SWITCH(VALUES( Dict1[Indicator]),
+ "Gas in Storage", "Gas Storage Stock, TWh",
+ "Injection", "Daily Injection, TWh",
+ "Withdrawal", "Daily Withdrawal, TWh", "Error")
+ )
+ ```
